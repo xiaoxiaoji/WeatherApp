@@ -36,20 +36,15 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(GetWeatherInfomation:) name:@"getWeInfo" object:nil];
     self.viewDeckController.delegate =self;
     self.defaults=[NSUserDefaults standardUserDefaults];
-    //self.tableView.backgroundColor=[UIColor blackColor];
     [self addNav];
     self.cityNameArr=[[NSMutableArray alloc]init];
     NSMutableArray *arr=[[self.defaults objectForKey:@"CityNameArr"] mutableCopy];
     self.cityNameArr=arr;
-    [self startLocation];
-    [self getWeInfomation];
     [self creatPlist];
     //[self startLocation];
-    // Uncomment the following line to preserve selection between presentations.
+    //[self getWeInfomation];
+    //[self creatPlist];
     // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
 -(void)getWeInfomation{
     self.model=[[getInfoModel alloc]init];
@@ -86,17 +81,12 @@
             cityId=[dict objectForKey:@"id"];
         }
     }
-//    NSMutableString *cityOne=[city mutableCopy];
-//    CFStringTransform((__bridge CFMutableStringRef)cityOne, NULL, kCFStringTransformMandarinLatin, NO);
-//    CFStringTransform((__bridge CFMutableStringRef)cityOne, NULL, kCFStringTransformStripCombiningMarks, NO);
-//    NSString *cityFinal=[cityOne stringByReplacingOccurrencesOfString:@" " withString:@""];
     NSString *requestUrl=[NSString stringWithFormat:@"https://api.heweather.com/x3/weather?cityid=%@&key=811180bf663341619d76ded7863e5e27",cityId];
     [manager GET:requestUrl parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         NSLog(@"succeed :%@",responseObject);
         NSDictionary *weatherInfomationDic=responseObject;
         NSArray *weatherInfomationArr=[weatherInfomationDic objectForKey:@"HeWeather data service 3.0"];
         [self.WEATHER_INFO_ARR addObject:weatherInfomationArr];
-       // [[NSNotificationCenter defaultCenter] postNotificationName:@"getCityNameARR" object:self userInfo:@{@"cityARR":self.cityNameArr,@"WEATHER_INFO_ARR":self.WEATHER_INFO_ARR}];
         [self.defaults setObject:self.cityNameArr forKey:@"CityNameArr"];
         [self.defaults synchronize];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"AddCityToMain" object:self userInfo:@{@"cityNameArr":self.cityNameArr,@"WEATHER_INFO_ARR":self.WEATHER_INFO_ARR}];
@@ -118,6 +108,9 @@
         NSString *getCityUrl=@"https://api.heweather.com/x3/citylist?search=allchina&key=811180bf663341619d76ded7863e5e27";
         [self.model getHotCityInfo:getCityUrl];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(GetCity:) name:@"getCityInfo" object:nil];
+    }else{
+        [self startLocation];
+
     }
     if ([[NSFileManager defaultManager] fileExistsAtPath:pathTwo] == NO)
     {
@@ -147,80 +140,24 @@
             NSLog(@"latitude : %f,longitude: %f",currentLocation.coordinate.latitude,currentLocation.coordinate.longitude);
             NSDictionary *dict = [place addressDictionary];
             self.cityName=[dict objectForKey:@"City"];
-            //NSLog(@"%lu",(unsigned long)self.cityName.length);
             if ([self.cityName containsString:@"市"]) {
                 self.cityName=[self.cityName stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"市"]];
             }
-            if (self.cityNameArr) {
+            if (self.cityNameArr.count) {
                 if (![[self.cityNameArr firstObject] isEqualToString:self.cityName]) {
                     [self.cityNameArr replaceObjectAtIndex:0 withObject:self.cityName];
-                    AFHTTPSessionManager *manager=[AFHTTPSessionManager manager];
-                    manager.responseSerializer=[AFJSONResponseSerializer serializer];
-                    NSString *path = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES) objectAtIndex:0]stringByAppendingPathComponent:@"cityInfo.plist"];
-                    NSArray *plistArray=[NSArray arrayWithContentsOfFile:path];
-                    NSString *cityId;
-                    for (NSDictionary *dict in plistArray) {
-                        if ([self.cityName isEqualToString:[dict objectForKey:@"city"]]) {
-                            cityId=[dict objectForKey:@"id"];
-                            NSLog(@"%@",cityId);
-                        }
-                    }
-//                    NSMutableString *cityOne=[self.cityName mutableCopy];
-//                    CFStringTransform((__bridge CFMutableStringRef)cityOne, NULL, kCFStringTransformMandarinLatin, NO);
-//                    CFStringTransform((__bridge CFMutableStringRef)cityOne, NULL, kCFStringTransformStripCombiningMarks, NO);
-//                    NSString *cityFinal=[cityOne stringByReplacingOccurrencesOfString:@" " withString:@""];
-                    NSString *requestUrl=[NSString stringWithFormat:@"https://api.heweather.com/x3/weather?cityid=%@&key=811180bf663341619d76ded7863e5e27",cityId];
-                    [manager GET:requestUrl parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-                        NSLog(@"succeed :%@",responseObject);
-                        NSDictionary *weatherInfomationDic=responseObject;
-                        NSArray *weatherInfomationArr=[weatherInfomationDic objectForKey:@"HeWeather data service 3.0"];
-                        [self.WEATHER_INFO_ARR replaceObjectAtIndex:0 withObject:weatherInfomationArr];
-                        [[NSNotificationCenter defaultCenter] postNotificationName:@"getCityNameARR" object:self userInfo:@{@"cityARR":self.cityNameArr,@"WEATHER_INFO_ARR":self.WEATHER_INFO_ARR}];
-                        [self.defaults setObject:self.cityNameArr forKey:@"CityNameArr"];
-                        [self.defaults synchronize];
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [self.tableView reloadData];
-                        });
-                    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                        NSLog(@"error :%@",error);
-                    }];
+                    [self.defaults setObject:self.cityNameArr forKey:@"CityNameArr"];
+                    [self.defaults synchronize];
+                    [self getWeInfomation];
                 }else{
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"getCityNameARR" object:self userInfo:@{@"cityARR":self.cityNameArr,@"WEATHER_INFO_ARR":self.WEATHER_INFO_ARR}];
+                    [self getWeInfomation];
                 }
             }else{
                 self.cityNameArr=[[NSMutableArray alloc]init];
                 [self.cityNameArr addObject:self.cityName];
-                AFHTTPSessionManager *manager=[AFHTTPSessionManager manager];
-                manager.responseSerializer=[AFJSONResponseSerializer serializer];
-                
-                NSString *path = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES) objectAtIndex:0]stringByAppendingPathComponent:@"cityInfo.plist"];
-                NSArray *plistArray=[NSArray arrayWithContentsOfFile:path];
-                NSString *cityId;
-                for (NSDictionary *dict in plistArray) {
-                    if ([self.cityName isEqualToString:[dict objectForKey:@"city"]]) {
-                        cityId=[dict objectForKey:@"id"];
-                    }
-                }
-                
-//                NSMutableString *cityOne=[self.cityName mutableCopy];
-//                CFStringTransform((__bridge CFMutableStringRef)cityOne, NULL, kCFStringTransformMandarinLatin, NO);
-//                CFStringTransform((__bridge CFMutableStringRef)cityOne, NULL, kCFStringTransformStripCombiningMarks, NO);
-//                NSString *cityFinal=[cityOne stringByReplacingOccurrencesOfString:@" " withString:@""];
-                NSString *requestUrl=[NSString stringWithFormat:@"https://api.heweather.com/x3/weather?cityid=%@&key=811180bf663341619d76ded7863e5e27",cityId];
-                [manager GET:requestUrl parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-                    NSLog(@"succeed :%@",responseObject);
-                    NSDictionary *weatherInfomationDic=responseObject;
-                    NSArray *weatherInfomationArr=[weatherInfomationDic objectForKey:@"HeWeather data service 3.0"];
-                    [self.WEATHER_INFO_ARR addObject:weatherInfomationArr];
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"getCityNameARR" object:self userInfo:@{@"cityARR":self.cityNameArr,@"WEATHER_INFO_ARR":self.WEATHER_INFO_ARR}];
-                    [self.defaults setObject:self.cityNameArr forKey:@"CityNameArr"];
-                    [self.defaults synchronize];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self.tableView reloadData];
-                    });
-                } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                    NSLog(@"error :%@",error);
-                }];
+                [self.defaults setObject:self.cityNameArr forKey:@"CityNameArr"];
+                [self.defaults synchronize];
+                [self getWeInfomation];
             }
         }
     }];
@@ -253,6 +190,7 @@
     NSFileManager* fileManager = [NSFileManager defaultManager];
     [fileManager createFileAtPath:path contents:nil attributes:nil];
     [cityInfoArr writeToFile:path atomically:YES];
+    [self startLocation];
 }
 -(void)GerWeatherCategory:(NSNotification *)notification{
     NSDictionary *weatherCategoryInfo=notification.userInfo[@"InfoFromAPI"];
@@ -265,15 +203,6 @@
 -(void)GetWeatherInfomation:(NSNotification *)notification{
     NSDictionary *weatherInfomationDic=notification.userInfo[@"InfoFromAPI"];
     NSArray *weatherInfomationArr=[weatherInfomationDic objectForKey:@"HeWeather data service 3.0"];
-//    NSMutableArray *processArr=[[NSMutableArray alloc]init];
-//    for (int i=0; i<weatherInfomationArr.count; i++) {
-//        for (NSString *city in self.cityNameArr) {
-//            if (![[[weatherInfomationArr[i] objectForKey:@"basic"] objectForKey:@"city"] isEqualToString:city]) {
-//                [processArr addObject:weatherInfomationArr[i]];
-//            }
-//        }
-//    }
-//    weatherInfomationArr=processArr;
     [self.WEATHER_INFO_ARR addObject:weatherInfomationArr];
     if (self.WEATHER_INFO_ARR.count==self.cityNameArr.count) {
         NSMutableArray *arr=[[NSMutableArray alloc]init];
@@ -284,10 +213,9 @@
                 }
             }
         }
-        //[self.WEATHER_INFO_ARR removeAllObjects];
         self.WEATHER_INFO_ARR=arr;
         [self.tableView reloadData];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"getWeatherInfoToMain" object:self userInfo:@{@"weatherInfoArr":self.WEATHER_INFO_ARR}];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"getWeatherInfoToMain" object:self userInfo:@{@"cityARR":self.cityNameArr,@"weatherInfoArr":self.WEATHER_INFO_ARR}];
     }
 }
 #pragma mark - Table view data source

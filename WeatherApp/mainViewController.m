@@ -38,7 +38,7 @@
     [super viewDidLoad];
     [self backImage];
     [self addNav];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadTables:) name:@"getCityNameARR" object:nil];
+   // [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadTables:) name:@"getCityNameARR" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(AddCity:) name:@"AddCityToMain" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectedFromMenu:) name:@"select" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getWeatherInfo:) name:@"getWeatherInfoToMain" object:nil];
@@ -46,12 +46,19 @@
 
 }
 -(void)getWeatherInfo:(NSNotification *)notification{
-    self.WEATHER_INFO_ARR=notification.userInfo[@"weatherInfoArr"];
-    if ([self.view.subviews lastObject]!=nil) {
-        [self.scrollView removeFromSuperview];
-    }
-    [self addScrollView];
-    [self scrollViewAddTableView];
+//    self.WEATHER_INFO_ARR=notification.userInfo[@"weatherInfoArr"];
+//    if ([self.view.subviews lastObject]!=nil) {
+//        [self.scrollView removeFromSuperview];
+//    }
+//    [self addScrollView];
+//    [self scrollViewAddTableView];
+    
+        self.cityNameArr=notification.userInfo[@"cityARR"];
+        self.WEATHER_INFO_ARR=notification.userInfo[@"weatherInfoArr"];
+        self.titleLabel.text=self.cityNameArr[0];
+        [self addScrollView];
+        [self scrollViewAddTableView];
+    
 }
 -(void)selectedFromMenu:(NSNotification *)notification{
     int index=[notification.userInfo[@"indexPath"] intValue];
@@ -99,16 +106,16 @@
 -(void)menuItemClick{
     [self showMainMenuView];
 }
--(void)loadTables:(NSNotification *)notification{
-    self.cityNameArr=notification.userInfo[@"cityARR"];
-    self.WEATHER_INFO_ARR=notification.userInfo[@"WEATHER_INFO_ARR"];
-    self.titleLabel.text=self.cityNameArr[0];
-    if ([self.view.subviews lastObject]!=nil) {
-        [self.scrollView removeFromSuperview];
-    }
-    [self addScrollView];
-    [self scrollViewAddTableView];
-}
+//-(void)loadTables:(NSNotification *)notification{
+//    self.cityNameArr=notification.userInfo[@"cityARR"];
+//    self.WEATHER_INFO_ARR=notification.userInfo[@"WEATHER_INFO_ARR"];
+//    self.titleLabel.text=self.cityNameArr[0];
+//    if ([self.view.subviews lastObject]!=nil) {
+//        [self.scrollView removeFromSuperview];
+//    }
+//    [self addScrollView];
+//    [self scrollViewAddTableView];
+//}
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     if (self.scrollView.contentOffset.x < 0)
@@ -153,7 +160,6 @@
     self.scrollView.pagingEnabled=YES;
     self.scrollView.contentSize=CGSizeMake(self.view.frame.size.width*self.cityNameArr.count, self.view.frame.size.height);
     [self.scrollView flashScrollIndicators];
-    // 是否同时运动,lock
     self.scrollView.directionalLockEnabled = YES;
     self.scrollView.bounces=YES;
     self.scrollView.showsHorizontalScrollIndicator=YES;

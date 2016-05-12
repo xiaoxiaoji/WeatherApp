@@ -9,13 +9,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "WeatherApp/mainViewController.m"
-            timestampString = "484763164.768162"
+            filePath = "WeatherApp/leftTableViewController.m"
+            timestampString = "484769223.65601"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "51"
-            endingLineNumber = "51"
-            landmarkName = "-getWeatherInfo:"
+            startingLineNumber = "157"
+            endingLineNumber = "157"
+            landmarkName = "-locationManager:didUpdateLocations:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

@@ -9,7 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface leftTableViewController : UITableViewController
-//@property(nonatomic)
 
 
 @end
