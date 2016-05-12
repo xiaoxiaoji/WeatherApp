@@ -7,7 +7,11 @@
 //
 
 #import "AppDelegate.h"
-
+#import "mainViewController.h"
+#import "navViewController.h"
+#import "menuNavViewController.h"
+#import "leftTableViewController.h"
+#import <ViewDeck.h>
 @interface AppDelegate ()
 
 @end
@@ -17,6 +21,17 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    self.window=[[UIWindow alloc]initWithFrame:[[UIScreen mainScreen] bounds]];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];  
+    mainViewController *mainView=[[mainViewController alloc]init];
+    navViewController *navView=[[navViewController alloc]initWithRootViewController:mainView];
+    leftTableViewController *leftView=[[leftTableViewController alloc]initWithStyle:UITableViewStylePlain];
+    menuNavViewController *menuNav=[[menuNavViewController alloc]initWithRootViewController:leftView];
+   // menuNav.navigationBar.frame=CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width-40, navView.navigationBar.frame.size.height);
+    IIViewDeckController *viewDeck=[[IIViewDeckController alloc]initWithCenterViewController:navView leftViewController:menuNav];
+    
+    [self.window setRootViewController:viewDeck];
+    [self.window makeKeyAndVisible];
     return YES;
 }
 

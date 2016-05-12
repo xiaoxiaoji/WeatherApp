@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  navViewController.h
 //  WeatherApp
 //
 //  Created by GMH on 5/4/16.
@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
-
+@interface navViewController : UINavigationController
 
 @end
-
