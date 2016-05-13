@@ -5,6 +5,7 @@
 
 pod 'AFNetworking', '~> 3.0'
 pod 'ViewDeck'
+pod "FSLineChart"
 
 target 'WeatherApp' do
 

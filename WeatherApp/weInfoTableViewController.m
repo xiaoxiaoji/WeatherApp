@@ -8,6 +8,7 @@
 
 #import "weInfoTableViewController.h"
 #import "UIImageView+WebCache.h"
+#import <FSLineChart.h>
 @interface weInfoTableViewController ()
 
 @end
@@ -38,7 +39,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 #warning Incomplete implementation, return the number of rows
-    return 5;
+    return 6;
 }
 
 
@@ -217,8 +218,8 @@
         lineLabel.backgroundColor=[UIColor whiteColor];
         [cell.contentView addSubview:lineLabel];
         
-        for (int i=0; i<7; i++) {
-            UILabel *labelTime=[[UILabel alloc]initWithFrame:CGRectMake((self.view.frame.size.width/7)*i, 5, self.view.frame.size.width/7, 30)];
+        for (int i=0; i<[[weInfoDic objectForKey:@"hourly_forecast"] count]; i++) {
+            UILabel *labelTime=[[UILabel alloc]initWithFrame:CGRectMake((self.view.frame.size.width/[[weInfoDic objectForKey:@"hourly_forecast"] count])*i, 5, self.view.frame.size.width/[[weInfoDic objectForKey:@"hourly_forecast"] count], 30)];
             labelTime.textAlignment=NSTextAlignmentCenter;
             labelTime.textColor=[UIColor whiteColor];
             labelTime.font=[UIFont systemFontOfSize:15.0f];
@@ -228,7 +229,7 @@
             labelTime.text=strTimeFinal;
             [cell.contentView addSubview:labelTime];
             
-            UILabel *popLabel=[[UILabel alloc]initWithFrame:CGRectMake((self.view.frame.size.width/7)*i, 35, self.view.frame.size.width/7, 30)];
+            UILabel *popLabel=[[UILabel alloc]initWithFrame:CGRectMake((self.view.frame.size.width/[[weInfoDic objectForKey:@"hourly_forecast"] count])*i, 35, self.view.frame.size.width/[[weInfoDic objectForKey:@"hourly_forecast"] count], 30)];
             popLabel.textAlignment=NSTextAlignmentCenter;
             popLabel.textColor=[UIColor whiteColor];
             popLabel.font=[UIFont systemFontOfSize:15.0f];
@@ -237,7 +238,7 @@
             popLabel.text=[NSString stringWithFormat:@"%@%@",popStr,percent];
             [cell.contentView addSubview:popLabel];
             
-            UILabel *labelTmp=[[UILabel alloc]initWithFrame:CGRectMake((self.view.frame.size.width/7)*i, 65, self.view.frame.size.width/7, 30)];
+            UILabel *labelTmp=[[UILabel alloc]initWithFrame:CGRectMake((self.view.frame.size.width/[[weInfoDic objectForKey:@"hourly_forecast"] count])*i, 65, self.view.frame.size.width/[[weInfoDic objectForKey:@"hourly_forecast"] count], 30)];
             labelTmp.textAlignment=NSTextAlignmentCenter;
             labelTmp.textColor=[UIColor whiteColor];
             labelTmp.font=[UIFont systemFontOfSize:15.0f];
@@ -259,7 +260,7 @@
             labelTime.textAlignment=NSTextAlignmentCenter;
             labelTime.textColor=[UIColor whiteColor];
             //labelTime.font=[UIFont systemFontOfSize:15.0f];
-            NSString *strTime=[[[weInfoDic objectForKey:@"hourly_forecast"][i] objectForKey:@"date"] substringFromIndex:5];
+            NSString *strTime=[[[weInfoDic objectForKey:@"daily_forecast"][i] objectForKey:@"date"] substringFromIndex:5];
             NSString *strTimee=[strTime substringToIndex:5];
             NSString *strTimeFinal=[NSString stringWithFormat:@"%@",strTimee];
             labelTime.text=strTimeFinal;
@@ -301,7 +302,10 @@
             labelWind.textAlignment=NSTextAlignmentCenter;
             labelWind.textColor=[UIColor whiteColor];
             //labelTime.font=[UIFont systemFontOfSize:15.0f];
-            NSString *strWind=[[[weInfoDic objectForKey:@"hourly_forecast"][i] objectForKey:@"wind"] objectForKey:@"dir"];
+            NSString *strWind=[[[weInfoDic objectForKey:@"daily_forecast"][i] objectForKey:@"wind"] objectForKey:@"dir"];
+            if ([strWind isEqualToString:@"无持续风向"]) {
+                strWind=@"无常风";
+            }
             labelWind.text=strWind;
             [cell.contentView addSubview:labelWind];
             
@@ -309,7 +313,7 @@
             labelWindSc.textAlignment=NSTextAlignmentCenter;
             labelWindSc.textColor=[UIColor whiteColor];
             labelWindSc.font=[UIFont systemFontOfSize:12.0f];
-            NSString *strWindSc=[[[weInfoDic objectForKey:@"hourly_forecast"][i] objectForKey:@"wind"] objectForKey:@"sc"];
+            NSString *strWindSc=[[[weInfoDic objectForKey:@"daily_forecast"][i] objectForKey:@"wind"] objectForKey:@"sc"];
             labelWindSc.text=[NSString stringWithFormat:@"%@级",strWindSc];
             [cell.contentView addSubview:labelWindSc];
             
@@ -319,6 +323,68 @@
             [TMP_MAX_ARR addObject:strTmp_max];
             [TMP_MIN_ARR addObject:strTmp_min];
         }
+        NSString *tmp_max=TMP_MAX_ARR[0];
+        NSString *tmp_min=TMP_MIN_ARR[0];
+
+        for (int i=1; i<TMP_MAX_ARR.count; i++) {
+            if ([TMP_MAX_ARR[i] intValue]>[tmp_max intValue]) {
+                tmp_max=TMP_MAX_ARR[i];
+            }
+        }
+        for (int i=1; i<TMP_MIN_ARR.count; i++) {
+            if ([TMP_MIN_ARR[i] intValue]<[tmp_min intValue]) {
+                tmp_min=TMP_MIN_ARR[i];
+            }
+        }
+        
+        
+        
+        FSLineChart* lineChart = [[FSLineChart alloc] initWithFrame:CGRectMake(-10, 100, self.view.frame.size.width+20, 200)];
+        lineChart.horizontalGridStep=6;
+        lineChart.verticalGridStep=[tmp_max intValue]-[tmp_min intValue];
+        lineChart.labelForValue = ^(CGFloat value) {
+            return [NSString stringWithFormat:@"%.f", value];
+        };
+
+        //lineChart.color=[UIColor clearColor];
+        //lineChart.fillColor=[UIColor clearColor];
+        lineChart.backgroundColor=[UIColor clearColor];
+        lineChart.displayDataPoint=YES;
+        //lineChart.dataPointColor=[UIColor whiteColor];
+        //lineChart.dataPointRadius=10;
+        lineChart.labelForValue=nil;
+        lineChart.labelForIndex=nil;
+        lineChart.axisLineWidth=0;
+        lineChart.innerGridLineWidth=0;
+        [lineChart setChartData:TMP_MAX_ARR];
+        [cell.contentView addSubview:lineChart];
+        
+        FSLineChart* lineChartmin = [[FSLineChart alloc] initWithFrame:CGRectMake(-10, 100, self.view.frame.size.width+20, 200)];
+        lineChartmin.horizontalGridStep=6;
+        lineChartmin.verticalGridStep=[tmp_max intValue]-[tmp_min intValue];
+        //lineChartmin.color=[UIColor redColor];
+        //lineChartmin.fillColor=[UIColor lightGrayColor];
+        lineChartmin.backgroundColor=[UIColor clearColor];
+        lineChartmin.displayDataPoint=YES;
+        lineChartmin.labelForValue=nil;
+        lineChartmin.labelForIndex=nil;
+        lineChartmin.axisLineWidth=0;
+        lineChartmin.innerGridLineWidth=0;
+        [lineChartmin setChartData:TMP_MIN_ARR];
+        [cell.contentView addSubview:lineChartmin];
+        
+    }else if (indexPath.row==5){
+        UILabel *lineLabel=[[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 0.5)];
+        lineLabel.backgroundColor=[UIColor whiteColor];
+        [cell.contentView addSubview:lineLabel];
+        
+        UILabel *labelTitle=[[UILabel alloc]initWithFrame:CGRectMake(10, 1, self.view.frame.size.width, 29)];
+        labelTitle.textColor=[UIColor whiteColor];
+        labelTitle.font=[UIFont systemFontOfSize:15];
+        labelTitle.text=@"生活指数";
+        [cell.contentView addSubview:labelTitle];
+        
+        
         
     }else{
         cell.textLabel.text=@"ssss";
@@ -337,6 +403,8 @@
         return 100;
     }else if (indexPath.row==4){
         return 435;
+    }else if (indexPath.row==5){
+        return 300;
     }else{
         return 40;
     }

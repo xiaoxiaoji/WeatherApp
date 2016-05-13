@@ -9,6 +9,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>FSLineChart.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>Pods-WeatherApp.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -37,17 +42,22 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>38A1B9B57FF5706D12EA43D4EAF01C90</key>
+		<key>2C7205364F32092FF26D7B979DCFBB92</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>3BDBC4BCEF8B67950C613547DB0960DF</key>
+		<key>4A157DF5BFB1D6557D5DBF1A73116191</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>3D430F382FFD6D75D7EC6D142316A316</key>
+		<key>6A404239EF51C51D3EA70B4049BFA8E5</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>7FBBFB82649D8A0669B7285645A287B9</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -57,12 +67,12 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>AE4B86F709F2DCC3723558CC8CFB5D5D</key>
+		<key>B5B53FF67F6183878AC9A1B3ABC04B2A</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>FA16CF1236A5003E35DB921D0A880AE5</key>
+		<key>F93928C12607B470A0194C63EF60B27A</key>
 		<dict>
 			<key>primary</key>
 			<true/>

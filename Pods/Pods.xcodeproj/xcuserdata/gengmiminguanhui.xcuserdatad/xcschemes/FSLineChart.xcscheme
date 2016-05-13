@@ -14,10 +14,10 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '1A2500557593631AB3E81EA6'
-               BlueprintName = 'Pods-WeatherApp'
+               BlueprintIdentifier = '683AB1565D8FF87BBB85B149'
+               BlueprintName = 'FSLineChart'
                ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'libPods-WeatherApp.a'>
+               BuildableName = 'libFSLineChart.a'>
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
